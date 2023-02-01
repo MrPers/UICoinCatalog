@@ -1,7 +1,12 @@
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewContainerRef } from '@angular/core';
 import { RefreshCoinComponent } from '../refresh-coin/refresh-coin.component';
-import { URLService } from '../../services/url';
-import { Coin, RefDirective } from '../../services/types';
+import { URLService } from '../../../services/url';
+import { ICoin, DynamicDirective } from '../../../services/types';
+import { AddCoinComponent } from '../add-coin/add-coin.component';
+import { catchError, mergeMap, of, tap, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ErrorService } from '../../../services/error';
+import { DeleteCoinComponent } from '../delete-coin/delete-coin.component';
 
 @Component({
   selector: 'app-table',
@@ -10,50 +15,49 @@ import { Coin, RefDirective } from '../../services/types';
 })
 
 export class TableComponent implements OnInit {
-
-  @ViewChild(RefDirective, { static: false }) refDir: RefDirective
-  private resultCoins: Coin[] = [];
+  @ViewChild(DynamicDirective) dynamic: DynamicDirective;
+  private resultCoins: ICoin[] = [];
   private increaseDecrease = 1;
   private valueCriteria = "";
   private valuesOnKey = "";
-  public coins: Coin[] = [];
+  public coins: ICoin[] = [];
 
-  constructor(private urlService:URLService) {}
+  constructor(private urlService: URLService, private errorService: ErrorService) {}
 
   ngOnInit() {
-    this.urlService.getAllCoins()
-    .subscribe({    
-      next: (result : Coin[]) =>
-      {
-        this.coins = result;
-        this.resultCoins = this.coins;
-        //  result.map(x => {
-        //   x.name = x.name.toLowerCase();
-        //   return x;
-        // });
-      },
-      error: (e) => console.error(e),
-      complete: () => console.info('complete') 
+    this.outputCoins();
+  }
+
+  cleekAdd(): void {
+    const component = this.dynamic.viewContainerRef.createComponent(AddCoinComponent);
+    component.instance.close.subscribe(async ()=>{
+      this.dynamic.viewContainerRef.clear();
+      if(component.instance.coinName){
+        await this.addCoins(component.instance.coinName, new Date(component.instance.dateTime).getTime());
+      }
     });
   }
 
-  refresh(id: number): void {
-    // this.refDir.containerRef.clear();
-    const component = this.refDir.containerRef.createComponent(RefreshCoinComponent);
-
-    component.instance.text ="fdsfsdfsdfgsdgsdfg";
+  cleekRefresh(coin: ICoin): void {
+    const component = this.dynamic.viewContainerRef.createComponent(RefreshCoinComponent);
+    component.instance.name = coin.name;
     component.instance.close.subscribe(()=>{
-        this.refDir.containerRef.clear();
-    });
-    
+    this.dynamic.viewContainerRef.clear();
+      if(component.instance.send){        
+        this.refreshCoins(coin.id);
+      }
+    });    
   }
  
-  delete(id: number): void {
-
-  }
-
-  add(): void {
-
+  cleekDelete(coin: ICoin): void {
+    const component = this.dynamic.viewContainerRef.createComponent(DeleteCoinComponent);
+    component.instance.name = coin.name;
+    component.instance.close.subscribe(()=>{
+    this.dynamic.viewContainerRef.clear();
+      if(component.instance.send){
+        this.deleteCoins(coin.id);
+      }
+    }); 
   }
 
   onKey(event: any) { 
@@ -61,7 +65,7 @@ export class TableComponent implements OnInit {
     this.coins = [];
     this.resultCoins.forEach(coin => {
       for (var code in coin) {
-        if(code != "id" && coin[code].toString().toLowerCase().indexOf(this.valuesOnKey) > -1){
+        if(code != "id" && coin[code].toString().toLowerCase().indexOf(this.valuesOnKey) > -1 && code != "urlIcon"){
           this.coins.push(coin);
           break;
         }
@@ -91,4 +95,67 @@ export class TableComponent implements OnInit {
       return 0;
     });
   }
+  
+  outputCoins(){
+    return this.urlService.getAllCoins()
+    .subscribe({    
+      next: (result : ICoin[]) =>
+      { 
+        this.coins = result;
+        this.resultCoins = this.coins;
+      },
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)  ,
+      // complete: () => console.info('complete') 
+    });
+  }
+
+  addCoins(name: string, ticks: number){
+    this.urlService.addCoin(name, ticks)
+    .pipe(
+      mergeMap(() => this.urlService.getAllCoins())
+    )
+    .subscribe({
+      next: (result : ICoin[]) =>
+      { 
+        this.coins = result;
+        this.resultCoins = this.coins;
+      },
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)
+    });
+  }
+
+  deleteCoins(id: number){
+    this.urlService.deleteCoin(id)
+    .pipe(
+      // mergeMap({
+      // next: (result : boolean) => this.urlService.getAllCoins(),
+      // error: (e:HttpErrorResponse) => this.errorService.handle(e.message)})
+      mergeMap(() => this.urlService.getAllCoins())
+      //как перехвотить эту ошибку
+    )
+    .subscribe({
+      next: (result : ICoin[]) =>
+      { 
+        this.coins = result;
+        this.resultCoins = this.coins;
+      },
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)
+    });
+  }
+
+  refreshCoins(id: number){
+    this.urlService.updateCoin(id)
+    .pipe(
+      mergeMap(() => this.urlService.getAllCoins())
+    )
+    .subscribe({
+      next: (result : ICoin[]) =>
+      { 
+        this.coins = result;
+        this.resultCoins = this.coins;
+      },
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)
+    });
+  }  
+  
 }

@@ -1,10 +1,11 @@
-import { Time } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Chart } from 'chart.js/auto';
-import { dataCharts } from '../../services/constants';
-import { CoinExchange } from '../../services/types';
-import { URLService } from '../../services/url';
+import { dataCharts, timeStep } from '../../../services/constants';
+import { ErrorService } from '../../../services/error';
+import { ICoinExchange, IFullChart, ITimeStep } from '../../../services/types';
+import { URLService } from '../../../services/url';
 
 @Component({
   selector: 'app-chart',
@@ -17,50 +18,24 @@ export class ChartComponent implements OnInit {
   labelTime: string[] = [];
   contactMethods = dataCharts;
   constatadataChart: number= 0;
+  fullChart: IFullChart;
   myChart: any;
+  loading = false;
+  timeStep: ITimeStep[] = [];
 
-  constructor(private route:ActivatedRoute, private url:URLService) {
-    this.id =this.route.snapshot.params['id'];
-  }
+  constructor(private route:ActivatedRoute, private url:URLService, private errorService: ErrorService) {}
 
   ngOnInit()
   {
-
-    this.url.getRestResponse()
-    .subscribe({    
-      next: (result) =>
-      {
-        // debugger;
-        console.log(result);
-        // for (let index = 0; index < result.length; index++) {
-        //   this.contactMethods[0].volume.push(result[index].price_open);
-        //   this.contactMethods[1].volume.push(result[index].volume_traded);
-        //   this.labelTime.push(result[index].time_period_start);
-        // }
-        // this.drawChart(this.constatadataChart);
-      },
-      error: (e) => console.error(e)
-    });    
-
-    // this.url.getCoinById(this.id)
-    // .subscribe({    
-    //   next: (result: CoinExchange[]) =>
-    //   {
-    //     for (let index = 0; index < result.length; index++) {
-    //       const date: Date = new Date((result[index].time - 621355968000000000)/10000);
-    //       this.contactMethods[0].volume.push(result[index].prices);
-    //       this.contactMethods[1].volume.push(result[index].volumeTraded);
-    //       this.labelTime.push(date.toLocaleString());
-    //     }
-    //     this.drawChart(this.constatadataChart);
-    //   },
-    //   error: (e) => console.error(e),
-    //   complete: () => console.info('complete') 
-    // });
+    this.id =this.route.snapshot.params['id'];
+    this.timeStep = timeStep;
+    this.loading = true;
+    this.getCoinById();
+    this.getCoinsById();
   }
 
-  t(id:any){
-    // debugger;
+  t(id: number) {
+    debugger;
   }
 
   onChange(id: number) {
@@ -69,7 +44,7 @@ export class ChartComponent implements OnInit {
     this.drawChart(id);
   }
 
-  drawChart(id: number): void{
+  drawChart(id: number) {
     this.myChart = new Chart("myChart", {
       type: 'line',
       data: {
@@ -116,4 +91,29 @@ export class ChartComponent implements OnInit {
    });
   }
 
+  getCoinById() {
+    this.url.getCoinById(this.id)
+    .subscribe({
+      next: (result: IFullChart) => this.fullChart = result,
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)      
+    });
+  }
+
+  getCoinsById() {
+    this.url.getCoinsById(this.id)
+    .subscribe({
+      next: (result: ICoinExchange[]) =>
+      {
+        console.log(result);
+        for (let index = 0; index < result.length; index++) {
+          this.contactMethods[0].volume.push(result[index].prices);
+          this.contactMethods[1].volume.push(result[index].volumeTraded);
+          this.labelTime.push(new Date(result[index].time).toLocaleString());
+        }
+        this.loading = false;
+        this.drawChart(this.constatadataChart);
+      },
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)  
+    });
+  }
 }

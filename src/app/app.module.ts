@@ -14,8 +14,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { RefreshCoinComponent } from './pages/refresh-coin/refresh-coin.component';
 import { AddCoinComponent } from './pages/add-coin/add-coin.component';
 import { DeleteCoinComponent } from './pages/delete-coin/delete-coin.component';
-import { RefDirective } from './services/types';
-import { FormsModule } from '@angular/forms';
+import { DynamicDirective} from '../services/types';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { GlobalErrorComponent } from './elements/global-error/global-error.component';
+import { FocusDirective } from '../directives/focus.directive';
 
 @NgModule({
     declarations: [	
@@ -27,7 +29,9 @@ import { FormsModule } from '@angular/forms';
         RefreshCoinComponent,
         AddCoinComponent,
         DeleteCoinComponent,
-        RefDirective
+        DynamicDirective,
+        GlobalErrorComponent,
+        FocusDirective
     ],
     providers: [
         // CurrencyService,
@@ -44,7 +48,8 @@ import { FormsModule } from '@angular/forms';
         BrowserAnimationsModule,
         AppRoutes,
         HttpClientModule,
-        FormsModule
+        FormsModule, 
+        ReactiveFormsModule
         // LayoutModule,
         // NavComponent
     ]

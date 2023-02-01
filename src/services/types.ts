@@ -6,35 +6,47 @@ import { FormGroupDirective } from '@angular/forms';
 })
 
 @Directive({
-    selector: '[appRef]'
+    selector: "[dynamic-ref]"
 })
-
-export class RefDirective{
-    constructor(public containerRef: ViewContainerRef){}
+export class DynamicDirective {
+    constructor(public viewContainerRef: ViewContainerRef) {}
 }
 
 interface IObjectKeys {
     [key: string]: string | number;
 }
 
-export interface Coin extends IObjectKeys{
+export interface ICoin extends IObjectKeys{
     name:string;
+    urlIcon:string;
     id: number;
     prices:number;
     volumeTraded:number;
 }
 
-export interface CoinExchange{
+export interface ICoinExchange{
     time:number;
-    // id: number;
     prices:number;
     volumeTraded:number;
 }
 
-export interface contactCharts{
+export interface ITimeStep{
+    name: string;
+    time: number;
+}
+
+export interface IContactCharts{
     id: number;
     label: string;
     backgroundColor:string;
     above: string;
     volume: number[];
+}
+
+export interface IFullChart{
+    id: number;
+    name: string;
+    urlIcon:string;
+    genesisDate: string;
+    description: string;
 }

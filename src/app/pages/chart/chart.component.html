@@ -7,11 +7,21 @@
     </div>
     <div class="col-start-3 col-span-3">
         <ul class="flex flex-wrap items-center justify-center mb-6 text-gray-900 dark:text-white">
-            <li class="mr-4 md:mr-6 cursor-pointer" *ngFor="let method of contactMethods" [value]="method.id" (click)="t(method.id)" >{{ method.label }}</li>
+            <li class="mr-4 md:mr-6 cursor-pointer" *ngFor="let method of timeStep" [value]="method.name" (click)="t(method.time)" >{{ method.name }}</li>
         </ul>
     </div>
 </div>
 
+<p class="text-center text-lg" *ngIf="loading" >
+    Loading...
+</p>
+
 <div>
     <canvas id="myChart"></canvas>
+</div>
+
+<div>
+    <button
+        class="right-6 rounded-full bg-blue-600 text-white fixed bottom-5 py-2 px-4"
+    >+</button>
 </div>
