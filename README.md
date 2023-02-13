@@ -1,6 +1,6 @@
-# UICoin Catalog
+# UICoinCatalog - my learning project
 
-UICoinCatalog is a frontend addon to APICoinCatalog
+APICoinCatalog is a frontend addon to APICoinCatalog
 
 ## Applications use:
 
