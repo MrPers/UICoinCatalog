@@ -1,20 +1,19 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewContainerRef } from '@angular/core';
 import { RefreshCoinComponent } from '../refresh-coin/refresh-coin.component';
-import { URLService } from '../../../services/url';
-import { ICoin, DynamicDirective } from '../../../services/types';
 import { AddCoinComponent } from '../add-coin/add-coin.component';
 import { catchError, mergeMap, of, tap, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ErrorService } from '../../../services/error';
 import { DeleteCoinComponent } from '../delete-coin/delete-coin.component';
+import { DynamicDirective, ICoin } from '../../../../../services/types';
+import { ErrorService } from '../../../../../services/error';
+import { URLService } from '../../../../../services/url';
 
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
-  styleUrls: ['./table.component.css']
 })
 
-export class TableComponent implements OnInit {
+export class TableCoinComponent implements OnInit {
   @ViewChild(DynamicDirective) dynamic: DynamicDirective;
   private resultCoins: ICoin[] = [];
   private increaseDecrease = 1;
@@ -112,7 +111,11 @@ export class TableComponent implements OnInit {
   addCoins(name: string, ticks: number){
     this.urlService.addCoin(name, ticks)
     .pipe(
-      mergeMap(() => this.urlService.getAllCoins())
+      mergeMap(() => this.urlService.getAllCoins()),
+      catchError(error => {
+        this.errorService.handle(error.error);
+        return throwError(() => new Error()); // return error that will trigger the subscriptions `error` block
+      })
     )
     .subscribe({
       next: (result : ICoin[]) =>
@@ -120,18 +123,18 @@ export class TableComponent implements OnInit {
         this.coins = result;
         this.resultCoins = this.coins;
       },
-      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.error)
     });
   }
 
   deleteCoins(id: number){
     this.urlService.deleteCoin(id)
     .pipe(
-      // mergeMap({
-      // next: (result : boolean) => this.urlService.getAllCoins(),
-      // error: (e:HttpErrorResponse) => this.errorService.handle(e.message)})
-      mergeMap(() => this.urlService.getAllCoins())
-      //как перехвотить эту ошибку
+      mergeMap(() => this.urlService.getAllCoins()),
+      catchError(error => {
+        this.errorService.handle(error.error);
+        return throwError(() => new Error()); 
+      })
     )
     .subscribe({
       next: (result : ICoin[]) =>
@@ -139,14 +142,18 @@ export class TableComponent implements OnInit {
         this.coins = result;
         this.resultCoins = this.coins;
       },
-      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.error)
     });
   }
 
   refreshCoins(id: number){
     this.urlService.updateCoin(id)
     .pipe(
-      mergeMap(() => this.urlService.getAllCoins())
+      mergeMap(() => this.urlService.getAllCoins()),
+      catchError(error => {
+        this.errorService.handle(error.error);
+        return throwError(() => new Error()); 
+      })
     )
     .subscribe({
       next: (result : ICoin[]) =>
@@ -154,7 +161,7 @@ export class TableComponent implements OnInit {
         this.coins = result;
         this.resultCoins = this.coins;
       },
-      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.error)
     });
   }  
   

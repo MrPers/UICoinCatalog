@@ -16,8 +16,7 @@ export class URLService {
   addCoin(name: string, ticks: number) : Observable<any> {
     var formData: any = new FormData();
     formData.append('ticks', ticks);
-    return this.http.post(URLpath + 'Coin/add-coin-&-coinExchanges/' + name, formData)
-    .pipe(debounceTime(1000));
+    return this.http.post(URLpath + 'Coin/add-coin-&-coinExchanges/' + name, formData);
   };
 
   getAllCoins() : Observable<ICoin[]> {
@@ -25,14 +24,14 @@ export class URLService {
     .pipe(retry(2));
   };
 
-  getCoinsById(id: number) : Observable<ICoinExchange[]> {
-    return this.http.get<ICoinExchange[]>(URLpath + 'Coin/get-coinExchanges-by-coin-id/' + id)
-    .pipe(debounceTime(1000));
+  getCoinsById(id: number, step: number) : Observable<ICoinExchange[]> {
+    return this.http.get<ICoinExchange[]>(URLpath + 'Coin/get-coinExchanges-by-coin-id/' + id + '/' + step)
+    .pipe(retry(2));
   };
 
   getCoinById(id: number) : Observable<IFullChart> {
     return this.http.get<IFullChart>(URLpath + 'Coin/get-coin-full-information-by-coin-id/' + id)
-    .pipe(debounceTime(1000));
+    .pipe(retry(2));
   };
 
   deleteCoin(id: number) : Observable<any> {

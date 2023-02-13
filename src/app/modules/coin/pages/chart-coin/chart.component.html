@@ -7,7 +7,11 @@
     </div>
     <div class="col-start-3 col-span-3">
         <ul class="flex flex-wrap items-center justify-center mb-6 text-gray-900 dark:text-white">
-            <li class="mr-4 md:mr-6 cursor-pointer" *ngFor="let method of timeStep" [value]="method.name" (click)="t(method.time)" >{{ method.name }}</li>
+            <li class="mr-4 md:mr-6 cursor-pointer" *ngFor="let method of timesStep">
+                <button [class.selected]="method.time === timeStep" type="button" (click)="chooseStep(method.time)">
+                    {{ method.name }}
+                </button>
+            </li>
         </ul>
     </div>
 </div>

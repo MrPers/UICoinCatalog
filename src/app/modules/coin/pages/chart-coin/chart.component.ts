@@ -2,17 +2,17 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Chart } from 'chart.js/auto';
-import { dataCharts, timeStep } from '../../../services/constants';
-import { ErrorService } from '../../../services/error';
-import { ICoinExchange, IFullChart, ITimeStep } from '../../../services/types';
-import { URLService } from '../../../services/url';
+import { dataCharts, timeStep } from '../../../../../services/constants';
+import { ErrorService } from '../../../../../services/error';
+import { ICoinExchange, IFullChart, ITimeStep } from '../../../../../services/types';
+import { URLService } from '../../../../../services/url';
 
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.css']
 })
-export class ChartComponent implements OnInit {
+export class ChartCoinComponent implements OnInit {
 
   private id: number;
   labelTime: string[] = [];
@@ -21,21 +21,27 @@ export class ChartComponent implements OnInit {
   fullChart: IFullChart;
   myChart: any;
   loading = false;
-  timeStep: ITimeStep[] = [];
+  timesStep: ITimeStep[] = [];
+  timeStep: number;
+  
 
   constructor(private route:ActivatedRoute, private url:URLService, private errorService: ErrorService) {}
 
   ngOnInit()
   {
     this.id =this.route.snapshot.params['id'];
-    this.timeStep = timeStep;
+    this.timesStep = timeStep;
+    this.timeStep = this.timesStep[0].time;
     this.loading = true;
     this.getCoinById();
     this.getCoinsById();
   }
 
-  t(id: number) {
-    debugger;
+  chooseStep(id: number) {
+    this.timeStep = id;
+    this.myChart.destroy();
+    this.loading = true;
+    this.getCoinsById();
   }
 
   onChange(id: number) {
@@ -95,16 +101,19 @@ export class ChartComponent implements OnInit {
     this.url.getCoinById(this.id)
     .subscribe({
       next: (result: IFullChart) => this.fullChart = result,
-      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)      
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.error)      
     });
   }
 
   getCoinsById() {
-    this.url.getCoinsById(this.id)
+    this.url.getCoinsById(this.id, this.timeStep)
     .subscribe({
       next: (result: ICoinExchange[]) =>
       {
-        console.log(result);
+        this.contactMethods[0].volume =[];
+        this.contactMethods[1].volume =[];
+        this.labelTime =[];
+
         for (let index = 0; index < result.length; index++) {
           this.contactMethods[0].volume.push(result[index].prices);
           this.contactMethods[1].volume.push(result[index].volumeTraded);
@@ -113,7 +122,7 @@ export class ChartComponent implements OnInit {
         this.loading = false;
         this.drawChart(this.constatadataChart);
       },
-      error: (e:HttpErrorResponse) => this.errorService.handle(e.message)  
+      error: (e:HttpErrorResponse) => this.errorService.handle(e.error)  
     });
   }
 }
