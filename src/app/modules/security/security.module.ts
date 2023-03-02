@@ -3,24 +3,22 @@ import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { SecurityComponent } from './security.component';
 import { SecurityRouttes } from './security.routing';
-// import { BrowserModule } from '@angular/platform-browser';
+import { RefreshComponent } from './pages/refresh/refresh.component';
+import { CallbackComponent } from './pages/auth-callback/callback.component';
+
 
 @NgModule({  
-declarations: [
-  SecurityComponent,
-],
-imports: [
-  CommonModule, // using these in-built directives like "ngFor, ngIf"
-  HttpClientModule,
-  // FormsModule, 
-  // ReactiveFormsModule,
-  SecurityRouttes
-],
-entryComponents: [
-],
-providers: [
-],
-bootstrap: [SecurityComponent]
+  declarations: [
+    SecurityComponent,
+    RefreshComponent,
+    CallbackComponent,
+  ],
+  imports: [
+    CommonModule, // using these in-built directives like "ngFor, ngIf"
+    HttpClientModule,
+    SecurityRouttes
+  ],
+  bootstrap: [SecurityComponent]
 })
 
-export class CoinModule { }
+export class SecurityModule { }

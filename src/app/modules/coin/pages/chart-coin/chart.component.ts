@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Chart } from 'chart.js/auto';
 import { dataCharts, timeStep } from '../../../../../services/constants';
 import { ErrorService } from '../../../../../services/error';
-import { ICoinExchange, IFullChart, ITimeStep } from '../../../../../services/types';
+import { FullChart, ICoinExchange, ITimeStep } from '../../../../../services/types';
 import { URLService } from '../../../../../services/url';
 
 @Component({
@@ -18,7 +18,7 @@ export class ChartCoinComponent implements OnInit {
   labelTime: string[] = [];
   contactMethods = dataCharts;
   constatadataChart: number= 0;
-  fullChart: IFullChart;
+  fullChart: FullChart = new FullChart();
   myChart: any;
   loading = false;
   timesStep: ITimeStep[] = [];
@@ -100,13 +100,13 @@ export class ChartCoinComponent implements OnInit {
   getCoinById() {
     this.url.getCoinById(this.id)
     .subscribe({
-      next: (result: IFullChart) => this.fullChart = result,
+      next: (result: FullChart) => this.fullChart = result,
       error: (e:HttpErrorResponse) => this.errorService.handle(e.error)      
     });
   }
 
   getCoinsById() {
-    this.url.getCoinsById(this.id, this.timeStep)
+    this.url.getCoinsById({id: this.id, step: this.timeStep})
     .subscribe({
       next: (result: ICoinExchange[]) =>
       {

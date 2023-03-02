@@ -12,6 +12,14 @@ export class DynamicDirective {
     constructor(public viewContainerRef: ViewContainerRef) {}
 }
 
+export class FullChart{
+    id: number;
+    name: string;
+    urlIcon:string;
+    genesisDate: string;
+    description: string;
+}
+
 interface IObjectKeys {
     [key: string]: string | number;
 }
@@ -41,12 +49,4 @@ export interface IContactCharts{
     backgroundColor:string;
     above: string;
     volume: number[];
-}
-
-export interface IFullChart{
-    id: number;
-    name: string;
-    urlIcon:string;
-    genesisDate: string;
-    description: string;
 }

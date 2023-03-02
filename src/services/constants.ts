@@ -1,8 +1,10 @@
 import { IContactCharts, ITimeStep } from "./types";
 
-export const URLpath = "https://localhost:10000/";
-// export const currency: string = "RUB";
-// export const scale: string = "year";
+export class Constants {
+    public static apiURL = "https://localhost:1000/";
+    // export const currency: string = "RUB";
+    // export const scale: string = "year";
+}
 
 export const timeStep: ITimeStep[] = [
     { time: 24, name: "1DAY" },
