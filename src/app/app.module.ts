@@ -8,7 +8,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HeaderComponent } from './/elements/header/header.component';
 import { HttpClientModule } from '@angular/common/http';
 import { DynamicDirective} from '../services/types';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GlobalErrorComponent } from './elements/global-error/global-error.component';
 import { FocusDirective } from '../directives/focus.directive';
 import { CommonModule } from '@angular/common';
