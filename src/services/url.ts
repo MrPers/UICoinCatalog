@@ -37,16 +37,6 @@ export class URLService {
   updateCoin(id: number) : Observable<boolean> {
     return this.http.get<boolean>(Constants.apiURL +"Coin/update-coin-by-id-coin/" + id);
   };
-
-  // addCurrenciesHistory(input: any, name: string) : Observable<any> {
-  //   let testData:FormData = new FormData();
-  //   testData.append('file', input, name + '/' + input.name);
-  //   return this.http.post(URLpath + "addcurrencyhistory", testData, {
-  //     //  и без этого работает, надо разобраться
-  //     reportProgress: true, // Без observe: 'events' не работает
-  //     observe: 'events', // без reportProgress: true только HttpEventType.Sent и HttpEventType.Response
-  //   });
-  // };
 }
 
 

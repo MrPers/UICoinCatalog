@@ -1,9 +1,7 @@
 import { IContactCharts, ITimeStep } from "./types";
 
 export class Constants {
-    public static apiURL = "https://localhost:1000/";
-    // export const currency: string = "RUB";
-    // export const scale: string = "year";
+    public static apiURL = "http://localhost:1001/";
 }
 
 export const timeStep: ITimeStep[] = [
@@ -12,8 +10,6 @@ export const timeStep: ITimeStep[] = [
     { time: 120, name: "5DAY" },
     { time: 168, name: "7DAY" },
 ];
-
-// export const timeStep = new Map().set("1DAY", 34).set("3DAY", 35).set("5DAY", 36).set("7DAY", 37);
 
 export const dataCharts: IContactCharts[] = [
     { id: 0, label: "Prices", backgroundColor:'rgba(255, 165, 0, 0.7)', above: 'rgba(255, 165, 0, 0.5)', volume: []},

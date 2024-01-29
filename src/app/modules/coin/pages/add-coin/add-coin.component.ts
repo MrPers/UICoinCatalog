@@ -28,7 +28,6 @@ export class AddCoinComponent implements OnInit {
 
   submit(){
     this.coinName = this.myForm.controls['coinName'].value;
-    // this.invalidSend = true;
     this.close.emit();
   }
 }
